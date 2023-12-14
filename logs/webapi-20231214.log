@@ -1,0 +1,333 @@
+[2023-12-14 16:14:46.524 -05:00 INF] Executed DbCommand (7ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE DATABASE `nike`;
+[2023-12-14 16:14:46.619 -05:00 INF] Executed DbCommand (20ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `__EFMigrationsHistory` (
+    `MigrationId` varchar(150) CHARACTER SET utf8mb4 NOT NULL,
+    `ProductVersion` varchar(32) CHARACTER SET utf8mb4 NOT NULL,
+    CONSTRAINT `PK___EFMigrationsHistory` PRIMARY KEY (`MigrationId`)
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.674 -05:00 INF] Executed DbCommand (46ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 16:14:46.679 -05:00 INF] Executed DbCommand (4ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT `MigrationId`, `ProductVersion`
+FROM `__EFMigrationsHistory`
+ORDER BY `MigrationId`;
+[2023-12-14 16:14:46.688 -05:00 INF] Applying migration '20231214211435_InitialCreate'.
+[2023-12-14 16:14:46.730 -05:00 INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+ALTER DATABASE CHARACTER SET utf8mb4;
+[2023-12-14 16:14:46.738 -05:00 INF] Executed DbCommand (9ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `CategoriaProducto` (
+    `IdCategoriaProducto` int NOT NULL AUTO_INCREMENT,
+    `Nombre` varchar(30) CHARACTER SET utf8mb4 NOT NULL,
+    CONSTRAINT `PK_CategoriaProducto` PRIMARY KEY (`IdCategoriaProducto`)
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.746 -05:00 INF] Executed DbCommand (7ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `Cliente` (
+    `IdCliente` int NOT NULL AUTO_INCREMENT,
+    `Nombres` varchar(100) CHARACTER SET utf8mb4 NOT NULL,
+    `Apellidos` varchar(100) CHARACTER SET utf8mb4 NOT NULL,
+    `Direccion` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
+    `NroContacto` double NOT NULL,
+    CONSTRAINT `PK_Cliente` PRIMARY KEY (`IdCliente`)
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.755 -05:00 INF] Executed DbCommand (8ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `Pago` (
+    `IdPago` int NOT NULL AUTO_INCREMENT,
+    `Nombre` varchar(50) CHARACTER SET utf8mb4 NOT NULL,
+    CONSTRAINT `PK_Pago` PRIMARY KEY (`IdPago`)
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.763 -05:00 INF] Executed DbCommand (8ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `Rol` (
+    `IdRol` int NOT NULL AUTO_INCREMENT,
+    `NombreRol` varchar(50) CHARACTER SET utf8mb4 NOT NULL,
+    CONSTRAINT `PK_Rol` PRIMARY KEY (`IdRol`)
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.771 -05:00 INF] Executed DbCommand (9ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `user` (
+    `Id` int NOT NULL AUTO_INCREMENT,
+    `username` varchar(50) CHARACTER SET utf8mb4 NULL,
+    `email` varchar(100) CHARACTER SET utf8mb4 NOT NULL,
+    `password` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
+    CONSTRAINT `PK_user` PRIMARY KEY (`Id`)
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.783 -05:00 INF] Executed DbCommand (11ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `Producto` (
+    `IdProducto` int NOT NULL AUTO_INCREMENT,
+    `Nombre` varchar(150) CHARACTER SET utf8mb4 NOT NULL,
+    `Precio` double NOT NULL,
+    `IdCategoriaFk` int NOT NULL,
+    `Marca` varchar(50) CHARACTER SET utf8mb4 NOT NULL,
+    `UrlImagen` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
+    `StockDisponible` int NOT NULL,
+    CONSTRAINT `PK_Producto` PRIMARY KEY (`IdProducto`),
+    CONSTRAINT `FK_Producto_CategoriaProducto_IdCategoriaFk` FOREIGN KEY (`IdCategoriaFk`) REFERENCES `CategoriaProducto` (`IdCategoriaProducto`) ON DELETE CASCADE
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.795 -05:00 INF] Executed DbCommand (11ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `RefreshToken` (
+    `Id` int NOT NULL AUTO_INCREMENT,
+    `UsuarioId` int NOT NULL,
+    `Token` longtext CHARACTER SET utf8mb4 NULL,
+    `Expires` datetime(6) NOT NULL,
+    `Created` datetime(6) NOT NULL,
+    `Revoked` datetime(6) NULL,
+    CONSTRAINT `PK_RefreshToken` PRIMARY KEY (`Id`),
+    CONSTRAINT `FK_RefreshToken_user_UsuarioId` FOREIGN KEY (`UsuarioId`) REFERENCES `user` (`Id`) ON DELETE CASCADE
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.807 -05:00 INF] Executed DbCommand (12ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `userRol` (
+    `UsuarioId` int NOT NULL,
+    `RolId` int NOT NULL,
+    CONSTRAINT `PK_userRol` PRIMARY KEY (`UsuarioId`, `RolId`),
+    CONSTRAINT `FK_userRol_Rol_RolId` FOREIGN KEY (`RolId`) REFERENCES `Rol` (`IdRol`) ON DELETE CASCADE,
+    CONSTRAINT `FK_userRol_user_UsuarioId` FOREIGN KEY (`UsuarioId`) REFERENCES `user` (`Id`) ON DELETE CASCADE
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.821 -05:00 INF] Executed DbCommand (14ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `CarritoCompra` (
+    `IdCarritoCompra` int NOT NULL AUTO_INCREMENT,
+    `IdClienteFk` int NOT NULL,
+    `IdProductoFk` int NOT NULL,
+    `ProductoEnCarrito` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
+    `CantidadCadaProductoEnCarrito` int NOT NULL,
+    `PrecioTotalCarrito` double NOT NULL,
+    CONSTRAINT `PK_CarritoCompra` PRIMARY KEY (`IdCarritoCompra`),
+    CONSTRAINT `FK_CarritoCompra_Cliente_IdClienteFk` FOREIGN KEY (`IdClienteFk`) REFERENCES `Cliente` (`IdCliente`) ON DELETE CASCADE,
+    CONSTRAINT `FK_CarritoCompra_Producto_IdProductoFk` FOREIGN KEY (`IdProductoFk`) REFERENCES `Producto` (`IdProducto`) ON DELETE CASCADE
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.834 -05:00 INF] Executed DbCommand (12ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `Compra` (
+    `IdCompra` int NOT NULL AUTO_INCREMENT,
+    `IdProductoFk` int NOT NULL,
+    `Cantidad` int NOT NULL,
+    `ValorUnitUSD` double NOT NULL,
+    CONSTRAINT `PK_Compra` PRIMARY KEY (`IdCompra`),
+    CONSTRAINT `FK_Compra_Producto_IdProductoFk` FOREIGN KEY (`IdProductoFk`) REFERENCES `Producto` (`IdProducto`) ON DELETE CASCADE
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.843 -05:00 INF] Executed DbCommand (10ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `DetalleProducto` (
+    `IdDetalleProducto` int NOT NULL AUTO_INCREMENT,
+    `IdProductoFk` int NOT NULL,
+    `DetallesAdicionalesProducto` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
+    CONSTRAINT `PK_DetalleProducto` PRIMARY KEY (`IdDetalleProducto`),
+    CONSTRAINT `FK_DetalleProducto_Producto_IdProductoFk` FOREIGN KEY (`IdProductoFk`) REFERENCES `Producto` (`IdProducto`) ON DELETE CASCADE
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.865 -05:00 INF] Executed DbCommand (21ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE `ClienteCompra` (
+    `IdClienteCompra` int NOT NULL AUTO_INCREMENT,
+    `IdClienteFk` int NOT NULL,
+    `IdCompraFk` int NOT NULL,
+    `FechaTransaccion` DateTime NOT NULL,
+    `ValorTotalTransaccion` double NOT NULL,
+    `IdMetodoPagoFk` int NOT NULL,
+    `DireccionCliente` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
+    CONSTRAINT `PK_ClienteCompra` PRIMARY KEY (`IdClienteCompra`),
+    CONSTRAINT `FK_ClienteCompra_Cliente_IdClienteFk` FOREIGN KEY (`IdClienteFk`) REFERENCES `Cliente` (`IdCliente`) ON DELETE CASCADE,
+    CONSTRAINT `FK_ClienteCompra_Compra_IdCompraFk` FOREIGN KEY (`IdCompraFk`) REFERENCES `Compra` (`IdCompra`) ON DELETE CASCADE,
+    CONSTRAINT `FK_ClienteCompra_Pago_IdMetodoPagoFk` FOREIGN KEY (`IdMetodoPagoFk`) REFERENCES `Pago` (`IdPago`) ON DELETE CASCADE
+) CHARACTER SET=utf8mb4;
+[2023-12-14 16:14:46.869 -05:00 INF] Executed DbCommand (4ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO `Rol` (`IdRol`, `NombreRol`)
+VALUES (1, 'Administrador'),
+(2, 'Gerente'),
+(3, 'Empleado'),
+(4, 'Persona');
+[2023-12-14 16:14:46.882 -05:00 INF] Executed DbCommand (13ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX `IX_CarritoCompra_IdClienteFk` ON `CarritoCompra` (`IdClienteFk`);
+[2023-12-14 16:14:46.889 -05:00 INF] Executed DbCommand (7ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX `IX_CarritoCompra_IdProductoFk` ON `CarritoCompra` (`IdProductoFk`);
+[2023-12-14 16:14:46.897 -05:00 INF] Executed DbCommand (8ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX `IX_ClienteCompra_IdClienteFk` ON `ClienteCompra` (`IdClienteFk`);
+[2023-12-14 16:14:46.904 -05:00 INF] Executed DbCommand (6ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX `IX_ClienteCompra_IdCompraFk` ON `ClienteCompra` (`IdCompraFk`);
+[2023-12-14 16:14:46.912 -05:00 INF] Executed DbCommand (8ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX `IX_ClienteCompra_IdMetodoPagoFk` ON `ClienteCompra` (`IdMetodoPagoFk`);
+[2023-12-14 16:14:46.922 -05:00 INF] Executed DbCommand (11ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX `IX_Compra_IdProductoFk` ON `Compra` (`IdProductoFk`);
+[2023-12-14 16:14:46.930 -05:00 INF] Executed DbCommand (8ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX `IX_DetalleProducto_IdProductoFk` ON `DetalleProducto` (`IdProductoFk`);
+[2023-12-14 16:14:46.942 -05:00 INF] Executed DbCommand (12ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX `IX_Producto_IdCategoriaFk` ON `Producto` (`IdCategoriaFk`);
+[2023-12-14 16:14:46.949 -05:00 INF] Executed DbCommand (7ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX `IX_RefreshToken_UsuarioId` ON `RefreshToken` (`UsuarioId`);
+[2023-12-14 16:14:46.957 -05:00 INF] Executed DbCommand (7ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX `IX_userRol_RolId` ON `userRol` (`RolId`);
+[2023-12-14 16:14:46.958 -05:00 INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
+VALUES ('20231214211435_InitialCreate', '7.0.12');
+[2023-12-14 16:20:00.336 -05:00 INF] Executed DbCommand (7ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 16:20:00.365 -05:00 INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 16:20:00.381 -05:00 INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT `MigrationId`, `ProductVersion`
+FROM `__EFMigrationsHistory`
+ORDER BY `MigrationId`;
+[2023-12-14 16:20:00.390 -05:00 INF] No migrations were applied. The database is already up to date.
+[2023-12-14 16:20:00.456 -05:00 INF] User profile is available. Using 'C:\Users\user\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2023-12-14 16:20:00.489 -05:00 INF] Now listening on: http://localhost:5043
+[2023-12-14 16:20:00.491 -05:00 INF] Application started. Press Ctrl+C to shut down.
+[2023-12-14 16:20:00.491 -05:00 INF] Hosting environment: Development
+[2023-12-14 16:20:00.491 -05:00 INF] Content root path: C:\Users\user\Desktop\CampusShop\API
+[2023-12-14 16:24:33.626 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/swagger/index.html - null null
+[2023-12-14 16:24:33.678 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/swagger/index.html - 200 null text/html;charset=utf-8 53.5312ms
+[2023-12-14 16:24:33.837 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/swagger/v1/swagger.json - null null
+[2023-12-14 16:24:33.923 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 86.3032ms
+[2023-12-14 16:24:38.124 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/Api/CarritoCompra - null null
+[2023-12-14 16:24:38.130 -05:00 WRN] Failed to determine the https port for redirect.
+[2023-12-14 16:24:38.150 -05:00 INF] Authorization failed. These requirements were not met:
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (Employee)
+[2023-12-14 16:24:38.152 -05:00 INF] AuthenticationScheme: Bearer was challenged.
+[2023-12-14 16:24:38.155 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/Api/CarritoCompra - 404 0 null 30.8745ms
+[2023-12-14 16:24:38.156 -05:00 INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET http://localhost:5043/Api/CarritoCompra, Response status code: 404
+[2023-12-14 16:27:35.701 -05:00 INF] Application is shutting down...
+[2023-12-14 16:27:40.497 -05:00 INF] Executed DbCommand (6ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 16:27:40.529 -05:00 INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 16:27:40.548 -05:00 INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT `MigrationId`, `ProductVersion`
+FROM `__EFMigrationsHistory`
+ORDER BY `MigrationId`;
+[2023-12-14 16:27:40.558 -05:00 INF] No migrations were applied. The database is already up to date.
+[2023-12-14 16:27:40.620 -05:00 INF] User profile is available. Using 'C:\Users\user\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2023-12-14 16:27:40.652 -05:00 INF] Now listening on: http://localhost:5043
+[2023-12-14 16:27:40.654 -05:00 INF] Application started. Press Ctrl+C to shut down.
+[2023-12-14 16:27:40.655 -05:00 INF] Hosting environment: Development
+[2023-12-14 16:27:40.655 -05:00 INF] Content root path: C:\Users\user\Desktop\CampusShop\API
+[2023-12-14 16:27:49.315 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/swagger/index.html - null null
+[2023-12-14 16:27:49.369 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/swagger/index.html - 200 null text/html;charset=utf-8 54.0765ms
+[2023-12-14 16:27:49.475 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/swagger/v1/swagger.json - null null
+[2023-12-14 16:27:49.563 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 87.4329ms
+[2023-12-14 16:27:53.439 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/Api/CategoriaProducto - null null
+[2023-12-14 16:27:53.444 -05:00 WRN] Failed to determine the https port for redirect.
+[2023-12-14 16:27:53.459 -05:00 INF] Executing endpoint 'API.Controllers.CategoriaProductoController.Get11 (API)'
+[2023-12-14 16:27:53.468 -05:00 INF] Route matched with {action = "Get11", controller = "CategoriaProducto"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[API.Dtos.CategoriaProductoDto]]] Get11() on controller API.Controllers.CategoriaProductoController (API).
+[2023-12-14 16:27:53.677 -05:00 INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT `c`.`IdCategoriaProducto`, `c`.`Nombre`, `p`.`IdProducto`, `p`.`IdCategoriaFk`, `p`.`Marca`, `p`.`Nombre`, `p`.`Precio`, `p`.`StockDisponible`, `p`.`UrlImagen`
+FROM `CategoriaProducto` AS `c`
+LEFT JOIN `Producto` AS `p` ON `c`.`IdCategoriaProducto` = `p`.`IdCategoriaFk`
+ORDER BY `c`.`IdCategoriaProducto`
+[2023-12-14 16:27:53.692 -05:00 INF] Executing ObjectResult, writing value of type 'System.Collections.Generic.List`1[[API.Dtos.CategoriaProductoDto, API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+[2023-12-14 16:27:53.703 -05:00 INF] Executed action API.Controllers.CategoriaProductoController.Get11 (API) in 232.6064ms
+[2023-12-14 16:27:53.703 -05:00 INF] Executed endpoint 'API.Controllers.CategoriaProductoController.Get11 (API)'
+[2023-12-14 16:27:53.705 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/Api/CategoriaProducto - 200 null application/json; charset=utf-8 266.6963ms
+[2023-12-14 17:03:59.884 -05:00 INF] Application is shutting down...
+[2023-12-14 17:04:05.344 -05:00 INF] Executed DbCommand (5ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 17:04:05.373 -05:00 INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 17:04:05.389 -05:00 INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT `MigrationId`, `ProductVersion`
+FROM `__EFMigrationsHistory`
+ORDER BY `MigrationId`;
+[2023-12-14 17:04:05.399 -05:00 INF] No migrations were applied. The database is already up to date.
+[2023-12-14 17:04:05.460 -05:00 INF] User profile is available. Using 'C:\Users\user\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2023-12-14 17:04:05.492 -05:00 INF] Now listening on: http://localhost:5043
+[2023-12-14 17:04:05.494 -05:00 INF] Application started. Press Ctrl+C to shut down.
+[2023-12-14 17:04:05.494 -05:00 INF] Hosting environment: Development
+[2023-12-14 17:04:05.494 -05:00 INF] Content root path: C:\Users\user\Desktop\CampusShop\API
+[2023-12-14 17:04:32.075 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/swagger/index.html - null null
+[2023-12-14 17:04:32.128 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/swagger/index.html - 200 null text/html;charset=utf-8 54.3529ms
+[2023-12-14 17:04:32.238 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/swagger/v1/swagger.json - null null
+[2023-12-14 17:04:32.326 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 87.6481ms
+[2023-12-14 17:04:37.248 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/Api/CarritoCompra - null null
+[2023-12-14 17:04:37.253 -05:00 WRN] Failed to determine the https port for redirect.
+[2023-12-14 17:04:37.269 -05:00 INF] Authorization failed. These requirements were not met:
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (Employee)
+[2023-12-14 17:04:37.272 -05:00 INF] AuthenticationScheme: Bearer was challenged.
+[2023-12-14 17:04:37.275 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/Api/CarritoCompra - 404 0 null 27.4364ms
+[2023-12-14 17:04:37.276 -05:00 INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET http://localhost:5043/Api/CarritoCompra, Response status code: 404
+[2023-12-14 17:04:43.492 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/Api/CategoriaProducto - null null
+[2023-12-14 17:04:43.494 -05:00 INF] Executing endpoint 'API.Controllers.CategoriaProductoController.Get11 (API)'
+[2023-12-14 17:04:43.503 -05:00 INF] Route matched with {action = "Get11", controller = "CategoriaProducto"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.IEnumerable`1[API.Dtos.CategoriaProductoDto]]] Get11() on controller API.Controllers.CategoriaProductoController (API).
+[2023-12-14 17:04:43.704 -05:00 INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT `c`.`IdCategoriaProducto`, `c`.`Nombre`, `p`.`IdProducto`, `p`.`IdCategoriaFk`, `p`.`Marca`, `p`.`Nombre`, `p`.`Precio`, `p`.`StockDisponible`, `p`.`UrlImagen`
+FROM `CategoriaProducto` AS `c`
+LEFT JOIN `Producto` AS `p` ON `c`.`IdCategoriaProducto` = `p`.`IdCategoriaFk`
+ORDER BY `c`.`IdCategoriaProducto`
+[2023-12-14 17:04:43.759 -05:00 INF] Executing ObjectResult, writing value of type 'System.Collections.Generic.List`1[[API.Dtos.CategoriaProductoDto, API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+[2023-12-14 17:04:43.771 -05:00 INF] Executed action API.Controllers.CategoriaProductoController.Get11 (API) in 265.8077ms
+[2023-12-14 17:04:43.771 -05:00 INF] Executed endpoint 'API.Controllers.CategoriaProductoController.Get11 (API)'
+[2023-12-14 17:04:43.773 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/Api/CategoriaProducto - 200 null application/json; charset=utf-8 281.2012ms
+[2023-12-14 17:06:36.693 -05:00 INF] Application is shutting down...
+[2023-12-14 17:06:40.481 -05:00 INF] Executed DbCommand (9ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 17:06:40.520 -05:00 INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 17:06:40.537 -05:00 INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT `MigrationId`, `ProductVersion`
+FROM `__EFMigrationsHistory`
+ORDER BY `MigrationId`;
+[2023-12-14 17:06:40.550 -05:00 INF] No migrations were applied. The database is already up to date.
+[2023-12-14 17:06:40.632 -05:00 INF] User profile is available. Using 'C:\Users\user\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2023-12-14 17:06:40.682 -05:00 INF] Now listening on: http://localhost:5043
+[2023-12-14 17:06:40.684 -05:00 INF] Application started. Press Ctrl+C to shut down.
+[2023-12-14 17:06:40.684 -05:00 INF] Hosting environment: Development
+[2023-12-14 17:06:40.684 -05:00 INF] Content root path: C:\Users\user\Desktop\CampusShop\API
+[2023-12-14 17:07:58.158 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/swagger/index.html - null null
+[2023-12-14 17:07:58.214 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/swagger/index.html - 200 null text/html;charset=utf-8 56.9459ms
+[2023-12-14 17:07:58.338 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/swagger/v1/swagger.json - null null
+[2023-12-14 17:07:58.419 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 80.9386ms
+[2023-12-14 17:07:59.621 -05:00 INF] Application is shutting down...
+[2023-12-14 17:08:04.548 -05:00 INF] Executed DbCommand (8ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 17:08:04.580 -05:00 INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 17:08:04.597 -05:00 INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT `MigrationId`, `ProductVersion`
+FROM `__EFMigrationsHistory`
+ORDER BY `MigrationId`;
+[2023-12-14 17:08:04.607 -05:00 INF] No migrations were applied. The database is already up to date.
+[2023-12-14 17:08:04.680 -05:00 INF] User profile is available. Using 'C:\Users\user\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2023-12-14 17:08:04.711 -05:00 INF] Now listening on: http://localhost:5043
+[2023-12-14 17:08:04.713 -05:00 INF] Application started. Press Ctrl+C to shut down.
+[2023-12-14 17:08:04.713 -05:00 INF] Hosting environment: Development
+[2023-12-14 17:08:04.713 -05:00 INF] Content root path: C:\Users\user\Desktop\CampusShop\API
+[2023-12-14 17:08:04.811 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/swagger/index.html - null null
+[2023-12-14 17:08:04.864 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/swagger/index.html - 200 null text/html;charset=utf-8 53.7125ms
+[2023-12-14 17:08:04.912 -05:00 INF] Request starting HTTP/1.1 GET http://localhost:5043/swagger/v1/swagger.json - null null
+[2023-12-14 17:08:04.997 -05:00 INF] Request finished HTTP/1.1 GET http://localhost:5043/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 84.7687ms
+[2023-12-14 17:40:36.415 -05:00 INF] Application is shutting down...
+[2023-12-14 17:40:42.872 -05:00 INF] Executed DbCommand (6ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 17:40:42.904 -05:00 INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 17:40:42.921 -05:00 INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT `MigrationId`, `ProductVersion`
+FROM `__EFMigrationsHistory`
+ORDER BY `MigrationId`;
+[2023-12-14 17:40:42.935 -05:00 INF] No migrations were applied. The database is already up to date.
+[2023-12-14 17:40:42.999 -05:00 INF] User profile is available. Using 'C:\Users\user\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2023-12-14 17:40:43.033 -05:00 INF] Now listening on: http://localhost:5043
+[2023-12-14 17:40:43.034 -05:00 INF] Application started. Press Ctrl+C to shut down.
+[2023-12-14 17:40:43.035 -05:00 INF] Hosting environment: Development
+[2023-12-14 17:40:43.035 -05:00 INF] Content root path: C:\Users\user\Desktop\CampusShop\API
+[2023-12-14 17:48:27.592 -05:00 INF] Application is shutting down...
+[2023-12-14 17:48:30.911 -05:00 INF] Executed DbCommand (6ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 17:48:30.941 -05:00 INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 17:48:30.956 -05:00 INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT `MigrationId`, `ProductVersion`
+FROM `__EFMigrationsHistory`
+ORDER BY `MigrationId`;
+[2023-12-14 17:48:30.965 -05:00 INF] No migrations were applied. The database is already up to date.
+[2023-12-14 17:48:31.026 -05:00 INF] User profile is available. Using 'C:\Users\user\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2023-12-14 17:48:31.059 -05:00 INF] Now listening on: http://localhost:5043
+[2023-12-14 17:48:31.060 -05:00 INF] Application started. Press Ctrl+C to shut down.
+[2023-12-14 17:48:31.061 -05:00 INF] Hosting environment: Development
+[2023-12-14 17:48:31.061 -05:00 INF] Content root path: C:\Users\user\Desktop\CampusShop\API
+[2023-12-14 18:18:15.198 -05:00 INF] Application is shutting down...
+[2023-12-14 18:22:42.572 -05:00 INF] Executed DbCommand (5ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 18:22:42.601 -05:00 INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='nike' AND TABLE_NAME='__EFMigrationsHistory';
+[2023-12-14 18:22:42.616 -05:00 INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT `MigrationId`, `ProductVersion`
+FROM `__EFMigrationsHistory`
+ORDER BY `MigrationId`;
+[2023-12-14 18:22:42.626 -05:00 INF] No migrations were applied. The database is already up to date.
+[2023-12-14 18:22:42.683 -05:00 INF] User profile is available. Using 'C:\Users\user\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+[2023-12-14 18:22:42.715 -05:00 INF] Now listening on: http://localhost:5043
+[2023-12-14 18:22:42.717 -05:00 INF] Application started. Press Ctrl+C to shut down.
+[2023-12-14 18:22:42.717 -05:00 INF] Hosting environment: Development
+[2023-12-14 18:22:42.717 -05:00 INF] Content root path: C:\Users\user\Desktop\CampusShop\API
